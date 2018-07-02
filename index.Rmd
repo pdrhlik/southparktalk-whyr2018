@@ -46,7 +46,7 @@ library(ggplot2)
 theme_set(theme_bw())
 
 episode_words <- read_rds("data/episode_words.rds")
-with_stopwords <- read_rds("data/episode_words_with_stopwords.rds")
+
 by_episode <- group_by(episode_words, episode) %>%
 	summarise(
 		season_number = season_number[1],
@@ -58,7 +58,7 @@ by_episode <- group_by(episode_words, episode) %>%
 
 n_seasons <- max(episode_words$season_number)
 n_episodes <- max(episode_words$episode_number)
-n_words <- nrow(with_stopwords)
+n_words <- 914475
 n_words_no_stopwords <- nrow(episode_words)
 n_swear_words <- filter(episode_words, swear_word == TRUE) %>%
 	nrow()
