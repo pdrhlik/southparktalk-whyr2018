@@ -1,0 +1,22 @@
+<slide class="title-slide segue nobackground">
+  <img class="title-logo" src="{{page.url.assets}}/img/{{{ page.logo }}}">
+  <hgroup class="">
+    <h1>{{ page.title }}</h1>
+    <h2>{{ page.subtitle }}</h2>
+    <p>{{ page.author }}<br/>{{ page.job }}</p>
+  </hgroup>
+  <img class="title-avatar" src="{{page.url.assets}}/img/southparkme.png">
+  {{# page.github }}
+	<a href="https://github.com/{{ page.user }}/{{ page.repo }}/zipball/gh-pages" class="example">
+	 Download
+	</a>
+  {{/ page.github }}
+  <article></article>
+  {{# page.license }}
+  <footer class = 'license'>
+    <a href='http://creativecommons.org/licenses/{{{ page.license }}}/3.0/'>
+    <img width = '80px' src = 'http://mirrors.creativecommons.org/presskit/buttons/88x31/png/{{{ page.license }}}.png'>
+    </a>
+  </footer>
+  {{/ page.license }}
+</slide>

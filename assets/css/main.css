@@ -1,0 +1,65 @@
+@font-face {
+	font-family: southpark;
+	src: url(../fonts/southpark.ttf)
+}
+
+h1, h2 {
+	font-family: southpark !important;
+}
+
+.southpark {
+	font-family: southpark !important;
+}
+
+.title-slide {
+	background-color: black;
+}
+
+.title-slide hgroup * {
+	color: white !important;
+}
+
+img.title-logo {
+	width: 100%;
+}
+
+img.title-avatar, img.avatar-contact {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+img.title-avatar {
+	width: 25%;
+}
+
+img.avatar-contact {
+	width: 50%;
+}
+
+#southparkbg {
+	background-image: url(../img/southpark.png);
+}
+
+#naughty-episodes h2 {
+	font-size: 49px;
+}
+
+article p a {
+	vertical-align: top;
+}
+
+table, table tr, table th, table td {
+	background: transparent !important;
+	border: none !important;
+	border-collapse: unset !important;
+}
+
+.basic-stats-table .table {
+	border-collapse: separate;
+    border-spacing: 0 13px;
+}
+
+.basic-stats-table .table * {
+	font-size: 1.2em !important;
+}
