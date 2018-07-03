@@ -1,0 +1,320 @@
+---
+title       : GOING DOWN TO SOUTH PARK
+subtitle    : to make some tidytext analysis
+author      : Patrik Drhlík
+job         : freelance data scientist
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+logo		: boys.png
+--- #southparkbg
+<!-- South Park backgound intro slide -->
+
+---
+
+## Web scraping and R packages
+
+<img src="assets/img/fandom.png" style="width: 10%" />
+[South Park episode transcripts](https://southpark.wikia.com/wiki/Portal:Scripts)
+
+<img src="assets/img/imdb.svg" style="width: 10%" />
+[IMDB South Park episode ratings](https://www.imdb.com/title/tt0121955/episodes)
+
+Main R packages: [tidyverse](https://www.tidyverse.org/),
+[tidytext](https://www.tidytextmining.com/),
+[southparkr](https://github.com/pdrhlik/southparkr)
+
+<img src="assets/img/tidyverse.png" style="width: 10%" />
+<img src="assets/img/tidytextmining.png" style="width: 10%" />
+<img src="assets/img/southparkme.png" style="width: 15%" />
+
+<img src="assets/img/griefer.png" style="position: absolute; right: 10px; bottom: 50px;" />
+
+---
+
+## Glimpse at the data
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Load required packages and prepared data
+library(tidyverse)
+library(southparkr)
+library(kableExtra)
+library(ggplot2)
+theme_set(theme_bw())
+
+episode_words <- read_rds("data/episode_words.rds")
+
+by_episode <- group_by(episode_words, episode) %>%
+	summarise(
+		season_number = season_number[1],
+		episode_number = episode_number[1],
+		season_episode_number = season_episode_number[1],
+		user_rating = user_rating[1],
+		swear_word_ratio = sum(swear_word) / n()
+	)
+
+n_seasons <- max(episode_words$season_number)
+n_episodes <- max(episode_words$episode_number)
+n_words <- 914475
+n_words_no_stopwords <- nrow(episode_words)
+n_swear_words <- filter(episode_words, swear_word == TRUE) %>%
+	nrow()
+characters <- count(episode_words, character) %>%
+	arrange(desc(n))
+mean_rating <- mean(by_episode$user_rating)
+best_episode <- episode_words[which.max(episode_words$user_rating), ]
+worst_episode <- episode_words[which.min(episode_words$user_rating), ]
+```
+
+```{r, echo = FALSE}
+set.seed(424242)
+glimpse(episode_words[sample(1:n_words_no_stopwords, n_words_no_stopwords), ])
+```
+
+---
+
+## Basic statistics about the show
+
+<div class="basic-stats-table">
+```{r, echo = FALSE}
+basic_stats <- data_frame(
+	figures = c(
+		n_seasons,
+		n_episodes,
+		n_words,
+		n_words_no_stopwords,
+		n_swear_words,
+		round((n_swear_words / n_words_no_stopwords) * 100, 2),
+		round((n_words_no_stopwords / n_words) * 100, 2),
+		nrow(characters),
+		round(mean_rating, 2),
+		best_episode$user_rating,
+		worst_episode$user_rating
+	),
+	text = c(
+		"Number of seasons",
+		"Number of episodes",
+		"Number of words",
+		"No stopwords (a, the, this, ...)",
+		"Number of swear words",
+		"% of swear words",
+		"% used for analysis",
+		"Number of characters",
+		"Mean IMDB rating",
+		paste0(
+			best_episode$episode,
+			" (S0",
+			best_episode$season_number,
+			"E0",
+			best_episode$season_episode_number,
+			")"),
+		paste0(
+			worst_episode$episode,
+			" (S",
+			worst_episode$season_number,
+			"E0",
+			worst_episode$season_episode_number,
+			")")
+	)
+) %>%
+	mutate(
+		figures = prettyNum(figures, " ")
+	)
+# South Park colors
+# Green - #C3FCB2, Pink - #FBB7FE, Yellow - #F8FAA9, Red - #F9838F, White-blue-ish - #E2E4FF
+# Orange - #DA9870
+
+kable(basic_stats) %>%
+	kable_styling() %>%
+	column_spec(1, extra_css = "font-family: southpark;") %>%
+	row_spec(0, extra_css = "display: none;")
+```
+</div>
+
+<img src="assets/img/mrgarrison.png" style="position: absolute; right: 10px; bottom: 50px;" />
+
+---
+
+## How much who talks?
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 13.5, fig.align = "center"}
+by_character <- episode_words %>%
+	count(character) %>%
+	arrange(desc(n)) %>%
+	top_n(20)
+
+ggplot(by_character, aes(reorder(character, -n), n)) +
+	geom_col(fill = "#F9838F") +
+	labs(
+		x = "Character",
+		y = "Number of spoken words"
+	) +
+	theme(text = element_text(size = 25), axis.text.x = element_text(angle = 60, hjust = 1)) +
+	scale_y_continuous(labels = scales::comma)
+```
+
+---
+
+## Most used words by characters
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 13.5, fig.align = "center"}
+top_n_character_words <- count(episode_words, character, word) %>%
+	filter(character %in% c("cartman", "kyle", "stan", "kenny")) %>%
+	arrange(desc(n)) %>%
+	group_by(character) %>%
+	top_n(10) %>%
+	ungroup() %>%
+	arrange(character, desc(n)) %>%
+	mutate(word = factor(reorder(word, n)))
+
+ggplot(top_n_character_words, aes(word, n, fill = character)) +
+	geom_col(show.legend = FALSE) +
+	facet_wrap(~ character, scales = "free") +
+	coord_flip() +
+	labs(
+		y = "Number of occurrences",
+		x = "Word"
+	) +
+	theme(text = element_text(size = 25))
+```
+
+---
+
+## Overall swear word ratio
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=13.5, fig.align="center"}
+group_by(episode_words, episode_number) %>%
+	summarise(
+		mean_swear_word_ratio = sum(swear_word) / n()
+	) %>%
+ggplot(aes(episode_number, mean_swear_word_ratio)) +
+	geom_col(fill = "#F9838F") +
+	geom_smooth() +
+	theme(text = element_text(size = 25))
+```
+
+---
+
+## Character swear word ratio
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=13.5, fig.align="center"}
+group_by(episode_words, character, episode_number) %>%
+	summarise(
+		mean_swear_word_ratio = sum(swear_word) / n()
+	) %>%
+filter(character %in% c("cartman", "kyle", "stan", "kenny")) %>%
+ggplot(aes(episode_number, mean_swear_word_ratio, fill = character)) +
+	geom_col() +
+	geom_smooth() +
+	facet_wrap(~ character) +
+	theme(text = element_text(size = 25), legend.position = "none")
+```
+
+---
+
+## Overall sentiment analysis
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=13.5, fig.align="center"}
+group_by(episode_words, episode_number) %>%
+	summarise(
+		mean_score = mean(score, na.rm = TRUE)
+	) %>%
+ggplot(aes(episode_number, mean_score)) +
+	geom_col(fill = "#F9838F") +
+	geom_smooth() +
+	theme(text = element_text(size = 25))
+```
+
+---
+
+## Character sentiment analysis
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 13.5, fig.align = "center", dev.args = list(bg = 'transparent')}
+by_character_episode <- episode_words %>%
+	group_by(character, episode_number) %>%
+	summarise(
+		score = mean(score, na.rm = TRUE)
+	)
+
+filter(by_character_episode, character %in% c("cartman", "kyle", "stan", "kenny")) %>%
+ggplot(., aes(episode_number, score, fill = character)) +
+	geom_col() +
+	geom_smooth() +
+	labs(
+		x = "Episode number",
+		y = "Sentiment score"
+	) +
+	facet_wrap(~ character) +
+	theme(text = element_text(size = 25), legend.position = "none")
+```
+
+---
+
+## Episode popularity
+
+```{r, echo = FALSE, message = FALSE, warnings = FALSE, fig.width = 13.5, fig.align = "center"}
+ggplot(by_episode, aes(episode_number, user_rating)) +
+	geom_point(shape = 18, size = 8, alpha = 0.6, color = "#F9838F") +
+	geom_smooth() +
+	labs(
+		x = "Episode number",
+		y = "IMDB rating"
+	) +
+	theme(text = element_text(size = 25))
+```
+
+--- #naughty-episodes
+
+## Are naughty episodes more popular?
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 13.5, fig.align = "center"}
+ggplot(by_episode, aes(user_rating, swear_word_ratio)) +
+	geom_point(shape = 18, size = 8, alpha = 0.6, color = "#F9838F") +
+	geom_smooth() +
+	labs(
+		x = "IMDB rating",
+		y = "Swear word ratio"
+	) +
+	theme(text = element_text(size = 25))
+```
+
+--- #mysterion
+
+## So who's the naughtiest character?
+
+<img src="assets/img/mysterion.png" style="position: absolute; width: 35%; left: 30%;" />
+
+---
+
+## It's Kenny!
+
+<img src="assets/img/kenny.png" style="position: absolute; width: 35%; left: 30%;" />
+
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 13.5, fig.height=8.5}
+plot_swear_word_comparison("cartman", top_n_characters(episode_words, 20), episode_words, 25)
+```
+
+---
+
+## Contact
+<img src="assets/img/linkedin.png" width="32px" />
+[https://www.linkedin.com/in/patrik-drhlik/](https://www.linkedin.com/in/patrik-drhlik/)
+
+<img src="assets/img/github.png" width="32px" />
+[https://github.com/pdrhlik](https://github.com/pdrhlik)
+
+<img src="assets/img/twitter.png" width="32px" />
+[@PatrioScraper](https://twitter.com/PatrioScraper)
+
+<img src="assets/img/mail.png" width="32px" />
+[patrik.drhlik@gmail.com](mailto:patrik.drhlik@gmail.com)
+
+<img src="assets/img/blog.png" width="32px" />
+[https://www.patrio.blog](https://www.patrio.blog)
+
+<img src="assets/img/southparkme-contact.png" class="avatar-contact" />

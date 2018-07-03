@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GOING DOWN TO SOUTH PARK</title>
+  <meta charset="utf-8">
+  <meta name="description" content="GOING DOWN TO SOUTH PARK">
+  <meta name="author" content="Patrik Drhlík">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/main.css"></link>
+<link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <img class="title-logo" src="assets/img/boys.png">
+  <hgroup class="">
+    <h1>GOING DOWN TO SOUTH PARK</h1>
+    <h2>to make some tidytext analysis</h2>
+    <p>Patrik Drhlík<br/>freelance data scientist</p>
+  </hgroup>
+  <img class="title-avatar" src="assets/img/southparkme.png">
+  <article></article>
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="southparkbg" style="background:;">
+  <article data-timings="">
+    <!-- South Park backgound intro slide -->
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Web scraping and R packages</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/fandom.png" style="width: 10%" />
+<a href="https://southpark.wikia.com/wiki/Portal:Scripts">South Park episode transcripts</a></p>
+
+<p><img src="assets/img/imdb.svg" style="width: 10%" />
+<a href="https://www.imdb.com/title/tt0121955/episodes">IMDB South Park episode ratings</a></p>
+
+<p>Main R packages: <a href="https://www.tidyverse.org/">tidyverse</a>,
+<a href="https://www.tidytextmining.com/">tidytext</a>,
+<a href="https://github.com/pdrhlik/southparkr">southparkr</a></p>
+
+<p><img src="assets/img/tidyverse.png" style="width: 10%" />
+<img src="assets/img/tidytextmining.png" style="width: 10%" />
+<img src="assets/img/southparkme.png" style="width: 15%" /></p>
+
+<p><img src="assets/img/griefer.png" style="position: absolute; right: 10px; bottom: 50px;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Glimpse at the data</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code>## Observations: 312,767
+## Variables: 16
+## $ season                &lt;fct&gt; Season Thirteen, Season One, Season Sixt...
+## $ season_number         &lt;int&gt; 13, 1, 16, 5, 15, 3, 11, 9, 13, 3, 21, 8...
+## $ season_episode_number &lt;dbl&gt; 7, 10, 14, 10, 10, 4, 1, 2, 5, 15, 6, 1,...
+## $ episode               &lt;fct&gt; Fatbeard, Damien, Obama Wins!, How to Ea...
+## $ episode_number        &lt;int&gt; 188, 10, 237, 75, 219, 35, 154, 127, 186...
+## $ character             &lt;chr&gt; &quot;cartman&quot;, &quot;stan&quot;, &quot;kyle&quot;, &quot;jonesy&quot;, &quot;mr...
+## $ year                  &lt;int&gt; 2009, 1997, 2012, 2001, 2011, 1999, 2007...
+## $ line_number           &lt;int&gt; 63817, 4528, 76451, 31001, 72011, 16346,...
+## $ word                  &lt;chr&gt; &quot;hey&quot;, &quot;bubye&quot;, &quot;program&quot;, &quot;wrong&quot;, &quot;gen...
+## $ word_stem             &lt;chr&gt; &quot;hei&quot;, &quot;buby&quot;, &quot;program&quot;, &quot;wrong&quot;, &quot;gene...
+## $ swear_word            &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE...
+## $ episode_name          &lt;chr&gt; &quot;Fatbeard&quot;, &quot;Damien&quot;, &quot;Obama Wins!&quot;, &quot;Ho...
+## $ air_date              &lt;date&gt; 2009-04-22, 1998-02-04, 2012-11-07, 200...
+## $ user_rating           &lt;dbl&gt; 8.2, 8.1, 7.5, 8.1, 7.6, 6.7, 8.8, 8.8, ...
+## $ user_votes            &lt;dbl&gt; 1578, 1703, 1156, 1488, 1229, 1546, 2356...
+## $ score                 &lt;int&gt; NA, NA, NA, -2, 2, NA, NA, NA, NA, NA, N...
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Basic statistics about the show</h2>
+  </hgroup>
+  <article data-timings="">
+    <div class="basic-stats-table">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;display: none;"> figures </th>
+   <th style="text-align:left;display: none;"> text </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 21 </td>
+   <td style="text-align:left;"> Number of seasons </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 287 </td>
+   <td style="text-align:left;"> Number of episodes </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 914 475 </td>
+   <td style="text-align:left;"> Number of words </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 312 767 </td>
+   <td style="text-align:left;"> No stopwords (a, the, this, ...) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 6 170 </td>
+   <td style="text-align:left;"> Number of swear words </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 1.97 </td>
+   <td style="text-align:left;"> % of swear words </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 34.2 </td>
+   <td style="text-align:left;"> % used for analysis </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 4 403 </td>
+   <td style="text-align:left;"> Number of characters </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 8.14 </td>
+   <td style="text-align:left;"> Mean IMDB rating </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 9.6 </td>
+   <td style="text-align:left;"> Scott Tenorman Must Die (S05E04) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-family: southpark;"> 6.3 </td>
+   <td style="text-align:left;"> A Million Little Fibers (S10E05) </td>
+  </tr>
+</tbody>
+</table>
+</div>
+
+<p><img src="assets/img/mrgarrison.png" style="position: absolute; right: 10px; bottom: 50px;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>How much who talks?</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-4-1.png" title="plot of chunk unnamed-chunk-4" alt="plot of chunk unnamed-chunk-4" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>Most used words by characters</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-5-1.png" title="plot of chunk unnamed-chunk-5" alt="plot of chunk unnamed-chunk-5" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-7" style="background:;">
+  <hgroup>
+    <h2>Overall swear word ratio</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-6-1.png" title="plot of chunk unnamed-chunk-6" alt="plot of chunk unnamed-chunk-6" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-8" style="background:;">
+  <hgroup>
+    <h2>Character swear word ratio</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-7-1.png" title="plot of chunk unnamed-chunk-7" alt="plot of chunk unnamed-chunk-7" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-9" style="background:;">
+  <hgroup>
+    <h2>Overall sentiment analysis</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-8-1.png" title="plot of chunk unnamed-chunk-8" alt="plot of chunk unnamed-chunk-8" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-10" style="background:;">
+  <hgroup>
+    <h2>Character sentiment analysis</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-9-1.png" title="plot of chunk unnamed-chunk-9" alt="plot of chunk unnamed-chunk-9" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>Episode popularity</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-10-1.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="naughty-episodes" style="background:;">
+  <hgroup>
+    <h2>Are naughty episodes more popular?</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-11-1.png" title="plot of chunk unnamed-chunk-11" alt="plot of chunk unnamed-chunk-11" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="mysterion" style="background:;">
+  <hgroup>
+    <h2>So who&#39;s the naughtiest character?</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/mysterion.png" style="position: absolute; width: 35%; left: 30%;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-14" style="background:;">
+  <hgroup>
+    <h2>It&#39;s Kenny!</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/kenny.png" style="position: absolute; width: 35%; left: 30%;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-15" style="background:;">
+  <article data-timings="">
+    <p><img src="assets/fig/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-16" style="background:;">
+  <hgroup>
+    <h2>Contact</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/linkedin.png" width="32px" />
+<a href="https://www.linkedin.com/in/patrik-drhlik/">https://www.linkedin.com/in/patrik-drhlik/</a></p>
+
+<p><img src="assets/img/github.png" width="32px" />
+<a href="https://github.com/pdrhlik">https://github.com/pdrhlik</a></p>
+
+<p><img src="assets/img/twitter.png" width="32px" />
+<a href="https://twitter.com/PatrioScraper">@PatrioScraper</a></p>
+
+<p><img src="assets/img/mail.png" width="32px" />
+<a href="mailto:patrik.drhlik@gmail.com">patrik.drhlik@gmail.com</a></p>
+
+<p><img src="assets/img/blog.png" width="32px" />
+<a href="https://www.patrio.blog">https://www.patrio.blog</a></p>
+
+<p><img src="assets/img/southparkme-contact.png" class="avatar-contact" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='NA'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Web scraping and R packages'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Glimpse at the data'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Basic statistics about the show'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='How much who talks?'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Most used words by characters'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Overall swear word ratio'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Character swear word ratio'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Overall sentiment analysis'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Character sentiment analysis'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Episode popularity'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Are naughty episodes more popular?'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='So who&#39;s the naughtiest character?'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='It&#39;s Kenny!'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='NA'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='Contact'>
+         16
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
