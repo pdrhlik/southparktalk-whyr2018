@@ -186,10 +186,7 @@ Main R packages: [tidyverse](https://www.tidyverse.org/),
 
 ---
 
-
-```
-## Error in plot_swear_word_comparison("cartman", top_n_characters(episode_words, : could not find function "plot_swear_word_comparison"
-```
+![plot of chunk unnamed-chunk-12](assets/fig/unnamed-chunk-12-1.png)
 
 ---
 
