@@ -10,9 +10,6 @@ widgets     : []            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
 logo		: boys.png
---- #southparkbg
-<!-- South Park backgound intro slide -->
-
 ---
 
 ## Web scraping and R packages
@@ -138,83 +135,6 @@ kable(basic_stats) %>%
 
 ---
 
-## How much who talks?
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 13.5, fig.align = "center"}
-by_character <- episode_words %>%
-	count(character) %>%
-	arrange(desc(n)) %>%
-	top_n(20)
-
-ggplot(by_character, aes(reorder(character, -n), n)) +
-	geom_col(fill = "#F9838F") +
-	labs(
-		x = "Character",
-		y = "Number of spoken words"
-	) +
-	theme(text = element_text(size = 25), axis.text.x = element_text(angle = 60, hjust = 1)) +
-	scale_y_continuous(labels = scales::comma)
-```
-
----
-
-## Most used words by characters
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.width = 13.5, fig.align = "center"}
-top_n_character_words <- count(episode_words, character, word) %>%
-	filter(character %in% c("cartman", "kyle", "stan", "kenny")) %>%
-	arrange(desc(n)) %>%
-	group_by(character) %>%
-	top_n(10) %>%
-	ungroup() %>%
-	arrange(character, desc(n)) %>%
-	mutate(word = factor(reorder(word, n)))
-
-ggplot(top_n_character_words, aes(word, n, fill = character)) +
-	geom_col(show.legend = FALSE) +
-	facet_wrap(~ character, scales = "free") +
-	coord_flip() +
-	labs(
-		y = "Number of occurrences",
-		x = "Word"
-	) +
-	theme(text = element_text(size = 25))
-```
-
----
-
-## Overall swear word ratio
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=13.5, fig.align="center"}
-group_by(episode_words, episode_number) %>%
-	summarise(
-		mean_swear_word_ratio = sum(swear_word) / n()
-	) %>%
-ggplot(aes(episode_number, mean_swear_word_ratio)) +
-	geom_col(fill = "#F9838F") +
-	geom_smooth() +
-	theme(text = element_text(size = 25))
-```
-
----
-
-## Character swear word ratio
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=13.5, fig.align="center"}
-group_by(episode_words, character, episode_number) %>%
-	summarise(
-		mean_swear_word_ratio = sum(swear_word) / n()
-	) %>%
-filter(character %in% c("cartman", "kyle", "stan", "kenny")) %>%
-ggplot(aes(episode_number, mean_swear_word_ratio, fill = character)) +
-	geom_col() +
-	geom_smooth() +
-	facet_wrap(~ character) +
-	theme(text = element_text(size = 25), legend.position = "none")
-```
-
----
-
 ## Overall sentiment analysis
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=13.5, fig.align="center"}
@@ -226,29 +146,6 @@ ggplot(aes(episode_number, mean_score)) +
 	geom_col(fill = "#F9838F") +
 	geom_smooth() +
 	theme(text = element_text(size = 25))
-```
-
----
-
-## Character sentiment analysis
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width = 13.5, fig.align = "center", dev.args = list(bg = 'transparent')}
-by_character_episode <- episode_words %>%
-	group_by(character, episode_number) %>%
-	summarise(
-		score = mean(score, na.rm = TRUE)
-	)
-
-filter(by_character_episode, character %in% c("cartman", "kyle", "stan", "kenny")) %>%
-ggplot(., aes(episode_number, score, fill = character)) +
-	geom_col() +
-	geom_smooth() +
-	labs(
-		x = "Episode number",
-		y = "Sentiment score"
-	) +
-	facet_wrap(~ character) +
-	theme(text = element_text(size = 25), legend.position = "none")
 ```
 
 ---
