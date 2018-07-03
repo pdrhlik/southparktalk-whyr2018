@@ -1,7 +1,7 @@
 ---
 title       : GOING DOWN TO SOUTH PARK
 subtitle    : to make some tidytext analysis
-author      : Patrik Drhlík
+author      : PATRIK DRHLÍK
 job         : freelance data scientist
 framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
@@ -145,6 +145,10 @@ group_by(episode_words, episode_number) %>%
 ggplot(aes(episode_number, mean_score)) +
 	geom_col(fill = "#F9838F") +
 	geom_smooth() +
+	labs(
+		x = "Episode number",
+		y = "Mean sentiment score (AFINN)"
+	) +
 	theme(text = element_text(size = 25))
 ```
 
